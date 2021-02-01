@@ -1,0 +1,2 @@
+Sysmon 
+| where (CommandLine contains "set" and CommandLine contains "COMPlus_ETWEnabled" and (CommandLine contains "0" or CommandLine contains "false"))

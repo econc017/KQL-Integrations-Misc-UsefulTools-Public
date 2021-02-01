@@ -1,0 +1,31 @@
+name: DLL Execution via wuauclt.exe
+description: |
+  'Technique explained here => //https://dtm.uk/wuauclt/  https://www.joesandbox.com/analysis/215088/0/html'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+query: |
+    SecurityEvent
+    | where Process contains "wuauclt.exe"
+    | where CommandLine contains ".dll"
+    | extend AccountCustomEntity = Account 
+    | extend HostCustomEntity = Computer

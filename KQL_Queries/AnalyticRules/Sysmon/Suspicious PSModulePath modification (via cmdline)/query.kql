@@ -1,0 +1,2 @@
+Sysmon 
+| where ((CommandLine contains "SetEnvironmentVariable" and CommandLine contains "PSModulePath") or (CommandLine contains "env:PSModulePath" and CommandLine contains "="))

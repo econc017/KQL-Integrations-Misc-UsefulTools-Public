@@ -1,0 +1,151 @@
+name: Potential lolbins usage detected 
+description: |
+  'Living off the land binaries are microsoft signed executables that are not detected by antivirus solutions but offer different opportunities
+  to enumerate the machine and launch attacks. This alert in particular presents'
+severity: low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+relevantTechniques:
+  - T1191
+  - T1085
+query: |
+  SecurityEvent
+  | where AccountType == "User"
+  | where Channel == "Security"
+  | where ParentProcessName == "C:\\Windows\\System32\\cmd.exe" 
+  | where CommandLine !contains "netstat"
+  | where CommandLine contains "At"
+  or CommandLine contains"Atbroker"
+  or CommandLine contains"Bash"
+  or CommandLine contains"Bitsadmin"
+  or CommandLine contains"Certutil"
+  or CommandLine contains"Cmdkey"
+  or CommandLine contains "Cmd"
+  or CommandLine contains"Cmstp"
+  or CommandLine contains"Control"
+  or CommandLine contains"Csc"
+  or CommandLine contains"Cscript"
+  or CommandLine contains"Dfsvc"
+  or CommandLine contains"Diskshadow"
+  or CommandLine contains"Dnscmd"
+  or CommandLine contains"Esentutl"
+  or CommandLine contains"Eventvwr"
+  or CommandLine contains"Expand"
+  or CommandLine contains"Extexport"
+  or CommandLine contains"Extrac32"
+  or CommandLine contains"Findstr"
+  or CommandLine contains"Forfiles"
+  or CommandLine contains"Ftp"
+  or CommandLine contains"GfxDownloadWrapper"
+  or CommandLine contains"Gpscript"
+  or CommandLine contains"Hh"
+  or CommandLine contains"Ie4uinit"
+  or CommandLine contains"Ieexec"
+  or CommandLine contains"Ilasm"
+  or CommandLine contains"Infdefaultinstall"
+  or CommandLine contains"Installutil"
+  or CommandLine contains"Jsc"
+  or CommandLine contains"Makecab"
+  or CommandLine contains"Mavinject"
+  or CommandLine contains"Microsoft.Workflow.Compiler"
+  or CommandLine contains"Mmc"
+  or CommandLine contains"Msbuild"
+  or CommandLine contains"Msconfig"
+  or CommandLine contains"Msdt"
+  or CommandLine contains"Mshta"
+  or CommandLine contains"Msiexec"
+  or CommandLine contains"Netsh" 
+  or CommandLine contains"Odbcconf"
+  or CommandLine contains"Pcalua"
+  or CommandLine contains"Pcwrun"
+  or CommandLine contains"Presentationhost"
+  or CommandLine contains"Print"
+  or CommandLine contains"Rasautou"
+  or CommandLine contains"Reg"
+  or CommandLine contains"Regasm"
+  or CommandLine contains"Regedit"
+  or CommandLine contains"Register-cimprovider"
+  or CommandLine contains"Regsvcs"
+  or CommandLine contains"Regsvr32"
+  or CommandLine contains"Replace"
+  or CommandLine contains"Rpcping"
+  or CommandLine contains"Rundll32"
+  or CommandLine contains"Runonce"
+  or CommandLine contains"Runscripthelper"
+  or CommandLine contains"Sc"
+  or CommandLine contains"Schtasks"
+  or CommandLine contains"Scriptrunner"
+  or CommandLine contains"SyncAppvPublishingServer"
+  or CommandLine contains"Tttracer"
+  or CommandLine contains"vbc"
+  or CommandLine contains"Verclsid"
+  or CommandLine contains"Wab"
+  or CommandLine contains"Wmic"
+  or CommandLine contains"Wscript"
+  or CommandLine contains"Wsreset"
+  or CommandLine contains"Xwizard"
+  or CommandLine contains"Advpack"
+  or CommandLine contains"Comsvcs"
+  or CommandLine contains"Ieadvpack"
+  or CommandLine contains"Ieaframe"
+  or CommandLine contains"Mshtml"
+  or CommandLine contains"Pcwutl"
+  or CommandLine contains"Setupapi"
+  or CommandLine contains"Shdocvw"
+  or CommandLine contains"Shell32"
+  or CommandLine contains"Syssetup"
+  or CommandLine contains"Url"
+  or CommandLine contains"Zipfldr"
+  or CommandLine contains"Appvlp"
+  or CommandLine contains"Bginfo"
+  or CommandLine contains"Cdb"
+  or CommandLine contains"csi"
+  or CommandLine contains"Devtoolslauncher"
+  or CommandLine contains"dnx"
+  or CommandLine contains"Dotnet"
+  or CommandLine contains"Dxcap"
+  or CommandLine contains"Excel"
+  or CommandLine contains"Mftrace"
+  or CommandLine contains"Msdeploy"
+  or CommandLine contains"msxsl"
+  or CommandLine contains"ntdsutil"
+  or CommandLine contains"Powerpnt"
+  or CommandLine contains"rcsi"
+  or CommandLine contains"Sqldumper"
+  or CommandLine contains"Sqlps"
+  or CommandLine contains"SQLToolsPS"
+  or CommandLine contains"Squirrel"
+  //or CommandLine contains"te"
+  or CommandLine contains"Tracker"
+  or CommandLine contains"Update"
+  or CommandLine contains"vsjitdebugger"
+  or CommandLine contains"Winword"
+  or CommandLine contains"Wsl"
+  or CommandLine contains"CL_Mutexverifiers"
+  or CommandLine contains"CL_Invocation"
+  or CommandLine contains"Manage-bde"
+  or CommandLine contains"Pubprn"
+  or CommandLine contains"Slmgr"
+  or CommandLine contains"Syncappvpublishingserver"
+  or CommandLine contains"winrm"
+  or CommandLine contains"Pester"
+  | extend AccountCustomEntity = Account
+  | extend HostCustomEntity = Computer

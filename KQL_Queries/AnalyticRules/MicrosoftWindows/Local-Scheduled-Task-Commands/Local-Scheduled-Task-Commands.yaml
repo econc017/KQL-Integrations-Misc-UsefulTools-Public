@@ -1,0 +1,36 @@
+name: Local Scheduled Task Commands 
+description: |
+  'A scheduled task can be used by an adversary to establish persistence, move laterally, and/or escalate privileges.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1053
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where EventID == "4688"
+  | where AccountType == "User"
+  | where EventID == "4688"
+  | where Process == "RegSvcs.exe"
+  or Process == "RegAsm.exe"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

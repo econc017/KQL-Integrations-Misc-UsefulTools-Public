@@ -1,0 +1,36 @@
+name: LolBas esentutl usage
+description: |
+  'esentutl Usage Detection'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+query: |
+  SecurityEvent 
+  | where EventID == 4688
+  | where (((((NewProcessName contains "\\esentutl.exe" 
+    and (CommandLine contains "/y" or CommandLine contains "-y")) 
+    and (CommandLine contains "/vss" or CommandLine contains "-vss")) 
+    and (CommandLine contains "/d" or CommandLine contains "-d")) 
+    or (NewProcessName contains "\\esentutl.exe" and (CommandLine contains "/p" or CommandLine contains "-p"))) 
+    or (NewProcessName contains "\\esentutl.exe" and (CommandLine contains "/o" or CommandLine contains "-o")))
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

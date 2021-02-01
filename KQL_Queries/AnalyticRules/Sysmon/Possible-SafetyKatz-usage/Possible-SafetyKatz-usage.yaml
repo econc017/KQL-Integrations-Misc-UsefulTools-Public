@@ -1,0 +1,30 @@
+name: Possible SafetyKatz usage
+description: |
+  'SafetyKatz is a combination of slightly modified mimikatz and .NET PE Loader. And running via execute-assembly (command from Cobalt Strike, this command accepts a path to a local(attacker) executable assembly and runs it on the target in a temporary process) in memory.'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - CredentialAccess
+  - DefenseEvasion
+relevantTechniques:
+  - T1003
+  - T1055
+query: |
+  Sysmon | where ((GrantedAccess == "0x1fffff" or GrantedAccess == "0x1f3fff") and CallTrace contains "UNKNOWN") or TargetFilename == "Temp\\debug.bin" | extend AccountCustomEntity = UserName | extend HostCustomEntity = Computer

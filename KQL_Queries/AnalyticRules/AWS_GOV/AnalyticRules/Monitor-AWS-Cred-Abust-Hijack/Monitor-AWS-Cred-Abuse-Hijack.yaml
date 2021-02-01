@@ -1,0 +1,34 @@
+name: AWS Credential Abuse or Hijack
+description: |
+  'An attacker who has assumed the role of a legitimate account can call the GetCallerIdentity function to determine what account they are using. A legitimate user using legitimate credentials would not need to call GetCallerIdentity since they should already know what account they are using.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - CredentialAccess
+relevantTechniques:
+query: |
+  let timeframe = 1d;
+  AWSCloudTrailLogs
+  | where TimeGenerated > ago(timeframe)
+  | where EventName =~ "GetCallerIdentity" and UserIdentityType =~ "AssumedRole" 
+  | summarize StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated) by SourceIpAddress, EventName, EventTypeName, UserIdentityType, UserIdentityAccountId, UserIdentityPrincipalid, 
+  UserAgent, UserIdentityUserName, SessionMfaAuthenticated,AWSRegion, EventSource, AdditionalEventData, ResponseElements
+  | extend timestamp = StartTimeUtc, AccountCustomEntity = UserIdentityUserName, IPCustomEntity = SourceIpAddress
+  | sort by EndTimeUtc desc nulls last

@@ -1,0 +1,2 @@
+Sysmon 
+| where ((EventID == 17 or EventID == 18) and (PipeName == "msagent" or PipeName == "msf-pipe" or PipeName == "gruntsvc"))

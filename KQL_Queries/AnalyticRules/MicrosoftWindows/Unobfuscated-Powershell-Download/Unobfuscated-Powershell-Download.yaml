@@ -1,0 +1,33 @@
+name: Unobfuscated Powershell Download 
+description: |
+  'Detecs CommandLine Parameter when downloading code/payload via powershell'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1086
+query: |
+  SecurityEvent
+  | where AccountType == "User"
+  | where Channel == "Security"
+  | where CommandLine contains "downloadString" or CommandLine contains "downloadFile"
+  | extend HostCustomEntity = Computer
+  | extend AccountCustomEntity = UserName

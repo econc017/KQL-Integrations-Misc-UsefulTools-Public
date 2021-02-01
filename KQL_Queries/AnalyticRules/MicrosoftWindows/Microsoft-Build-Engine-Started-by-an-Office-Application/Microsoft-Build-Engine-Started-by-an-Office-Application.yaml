@@ -1,0 +1,44 @@
+name: Microsoft Build Engine Started by an Office Application
+description: |
+  'An instance of MSBuild, the Microsoft Build Engine, was started by Excel or Word. This is unusual behavior for the Build Engine and could have been caused by an Excel or Word document executing a malicious script payload.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+  - Execution
+relevantTechniques:
+  - T1127
+  - TA0002
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where AccountType == "User"
+  | where EventID == "4688"
+  | where Process == "MSBuild.exe"
+  | where ParentProcessName  contains "eqnedt32.exe" 
+  or ParentProcessName contains "excel.exe" 
+  or ParentProcessName contains "fltldr.exe" 
+  or ParentProcessName contains "msaccess.exe" 
+  or ParentProcessName contains "mspub.exe"
+  or ParentProcessName contains "outlook.exe"  
+  or ParentProcessName contains "powerpnt.exe" 
+  or ParentProcessName contains "winword.exe"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

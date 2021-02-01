@@ -1,0 +1,8 @@
+SecurityEvent 
+| where EventID == 4688
+| where (((((NewProcessName contains "\\esentutl.exe" 
+    and (CommandLine contains "/y" or CommandLine contains "-y")) 
+    and (CommandLine contains "/vss" or CommandLine contains "-vss")) 
+    and (CommandLine contains "/d" or CommandLine contains "-d")) 
+    or (NewProcessName contains "\\esentutl.exe" and (CommandLine contains "/p" or CommandLine contains "-p"))) 
+    or (NewProcessName contains "\\esentutl.exe" and (CommandLine contains "/o" or CommandLine contains "-o")))

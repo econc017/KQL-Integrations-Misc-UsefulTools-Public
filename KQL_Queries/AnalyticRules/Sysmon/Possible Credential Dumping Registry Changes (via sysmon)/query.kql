@@ -1,0 +1,9 @@
+Sysmon 
+| where (((EventID == "13" or EventID == "12" or EventID == "14") 
+    and (TargetObject contains @"\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Provider\\" 
+    or TargetObject contains @"\\SYSTEM\\CurrentControlSet\\Control\\Lsa\\" 
+    or TargetObject contains @"\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\SecurityProviders\\" 
+    or TargetObject contains @"\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest\\" 
+    or TargetObject contains @"\\Lsa\\RestrictRemoteSamEventThrottlingWindow")) 
+    and not ((Image == @"C:\Windows\system32\lsass.exe" 
+    or Image == @"C:\Windows\system32\services.exe")))

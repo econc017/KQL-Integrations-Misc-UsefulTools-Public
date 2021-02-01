@@ -1,0 +1,12 @@
+{
+  "authority": "https://login.microsoftonline.us/DOMAIN.COM",
+  "client_id": "v6b***",
+  "scope": [
+    "https://management.usgovcloudapi.net/.default"
+  ],
+  "secret": "a6E***",
+  "endpoint": "https://management.usgovcloudapi.net",
+  "subscription": "ac4***",
+  "resourcegroup": "anrg-sentinel",
+  "workspace": "awkspc-usgov-sentinel"
+}

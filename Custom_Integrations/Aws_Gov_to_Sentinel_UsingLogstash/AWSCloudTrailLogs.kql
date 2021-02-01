@@ -1,0 +1,39 @@
+let CloudTrailLogs = 
+AWSCloudLogs_CL
+| where tags_s contains "CloudTrail"
+| extend
+EventName = tostring(parse_json(Message).eventName),
+UserIdentityPrincipalid = tostring(parse_json(tostring(parse_json(Message).userIdentity)).principalId),
+UserIdentityUserName = tostring(parse_json(tostring(parse_json(Message).userIdentity)).userName),
+SourceIpAddress = tostring(parse_json(Message).sourceIPAddress),
+SessionMfaAuthenticated = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(parse_json(Message).userIdentity)).sessionContext)).attributes)).mfaAuthenticated))),
+EventTypeName = tostring(parse_json(Message).eventType),
+UserAgent = tostring(parse_json(Message).userAgent),
+AWSRegion = tostring(parse_json(Message).awsRegion),
+EventSource = tostring(parse_json(Message).eventSource),
+UserIdentityAccountId = tostring(parse_json(tostring(parse_json(Message).userIdentity)).accountId),
+RequestParameters = tostring(parse_json(Message).requestParameters),
+UserIdentityArn = tostring(parse_json(tostring(parse_json(Message).userIdentity)).arn),
+UserIdentityType = tostring(parse_json(tostring(parse_json(Message).userIdentity)).type),
+ResponseElements = tostring(parse_json(Message).responseElements),
+AdditionalEventData = tostring(parse_json(Message).additionalEventData),
+SessionIssuerUserName = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(parse_json(Message).userIdentity)).sessionContext)).sessionIssuer)).userName)
+| project-reorder
+EventName,
+UserIdentityPrincipalid,
+UserIdentityArn,
+UserIdentityUserName,
+UserIdentityType,
+SourceIpAddress,
+SessionMfaAuthenticated,
+SessionIssuerUserName,
+AdditionalEventData,
+EventTypeName,
+RequestParameters,
+ResponseElements,
+UserAgent,
+AWSRegion,
+EventSource,
+UserIdentityAccountId
+;
+CloudTrailLogs

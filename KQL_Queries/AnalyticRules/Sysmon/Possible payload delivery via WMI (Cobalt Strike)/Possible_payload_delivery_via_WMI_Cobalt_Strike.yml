@@ -1,0 +1,34 @@
+name: Possible Payload Delivery via WMI cobalt strike
+description: |
+  'Detects Possible Payload Delivery via WMI cobalt strike'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+  - DefenseEvasion
+relevantTechniques:
+query: |
+  Sysmon
+  | where ((ParentImage == "WmiPrvSE.exe") 
+      and Image == "powershell.exe" 
+      and (CommandLine == "Value" 
+      or CommandLine == "env" 
+      or CommandLine == "IE" 
+      or CommandLine == "-w hidden -encodedcommand"))

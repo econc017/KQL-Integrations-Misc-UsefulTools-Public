@@ -1,0 +1,31 @@
+name: User Account Creation
+description: |
+  'Identifies attempts to create new local users. This is sometimes done by attackers to increase access to a system or domain.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1136
+query: |
+  SecurityEvent 
+  | where EventID == 4688 and (Process == "net.exe" or Process == "net1.exe") and not(ParentProcessName == "net.exe") and (CommandLine contains "user" and CommandLine contains "/add" or CommandLine contains "/ad")
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

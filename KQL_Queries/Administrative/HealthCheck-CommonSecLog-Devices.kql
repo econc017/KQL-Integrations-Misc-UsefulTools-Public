@@ -1,0 +1,3 @@
+CommonSecurityLog​
+| where TimeGenerated >= ago(30d)
+| summarize max(TimeGenerated) by DeviceVendor

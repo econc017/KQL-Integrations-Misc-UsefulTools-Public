@@ -1,0 +1,30 @@
+name: Unusual Process Network Connection
+description: |
+  'Identifies network activity from unexpected system applications. This may indicate adversarial activity as these applications are often leveraged by adversaries to execute code and evade detection.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1127
+query: |
+  Sysmon | where EventID == 3 | where Image contains "Microsoft.Workflow.Compiler.exe" or Image contains "bginfo.exe" or Image contains "cdb.exe"
+  or Image contains "cmstp.exe" or Image contains "csi.exe" or Image contains "dnx.exe" or Image contains "fsi.exe" or Image contains "ieexec.exe"
+  or Image contains "iexpress.exe" or Image contains "odbcconf.exe" or Image contains "rcsi.exe" or Image contains "xwizard.exe"

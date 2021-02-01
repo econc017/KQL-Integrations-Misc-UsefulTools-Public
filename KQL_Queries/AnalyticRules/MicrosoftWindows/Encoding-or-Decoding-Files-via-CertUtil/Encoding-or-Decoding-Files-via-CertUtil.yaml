@@ -1,0 +1,36 @@
+name: Encoding or Decoding Files via CertUtil
+description: |
+  'Identifies the use of certutil.exe to encode or decode data. CertUtil is a native Windows component which is part of Certificate Services. CertUtil is often abused by attackers to encode or decode base64 data for stealthier command and control or exfiltration.''
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Exfiltration
+relevantTechniques:
+  - T1140
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where EventID == "4688"
+  | where AccountType == "User"
+  | where Process == "certutil.exe"
+  | where CommandLine contains "encode"
+  or CommandLine contains "decode"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

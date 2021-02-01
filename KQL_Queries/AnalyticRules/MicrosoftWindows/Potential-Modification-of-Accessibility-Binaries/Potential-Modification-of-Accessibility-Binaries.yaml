@@ -1,0 +1,29 @@
+name: Potential Modification of Accessibility Binaries
+description: |
+  'Windows contains accessibility features that may be launched with a key combination before a user has logged in. An adversary can modify the way these programs are launched to get a command prompt or backdoor without logging in to the system.'
+severity: low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+  - PrivilegeEscalation
+relevantTechniques:
+  - T1015
+query: |
+  SecurityEvent | where EventID == 4688 and ParentProcessName contains "winlogon.exe" and (Process == "atbroker.exe" or Process == "displayswitch.exe" or Process == "magnify.exe" or Process == "narrator.exe" or Process == "osk.exe" or Process == "sethc.exe" or Process == "utilman.exe") | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

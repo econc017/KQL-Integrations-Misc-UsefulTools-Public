@@ -1,0 +1,29 @@
+name: PsExec Network Connection
+description: |
+  'Identifies use of the SysInternals tool PsExec.exe making a network connection. This could be an indication of lateral movement.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+  - LateralMovement
+relevantTechniques:
+  - T1035
+query: |
+  Sysmon | where EventID == 3 | where Image contains "PsExec.exe"

@@ -1,0 +1,28 @@
+name: Possible LSASS memory access via lsadump or similar tool (via audit)
+description: |
+  'Detects attempts to access LSASS process via mimikatz lsadump.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - CredentialAccess
+relevantTechniques:
+  - T1003
+query: |
+  SecurityEvent | where (EventID == 4656 and (ObjectType == "SAM_DOMAIN") and (ProcessName == "lsass.exe") and (AccessMask == "0x705")) | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

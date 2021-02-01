@@ -1,0 +1,30 @@
+name: Svchost spawning Cmd
+description: |
+  'Identifies a suspicious parent-child process relationship with cmd.exe descending from svchost.exe.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1059
+query: |
+  SecurityEvent | where ParentProcessName contains "svchost.exe" and Process == "cmd.exe"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

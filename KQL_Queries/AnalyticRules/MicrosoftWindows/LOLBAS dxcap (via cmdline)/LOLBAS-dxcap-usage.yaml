@@ -1,0 +1,32 @@
+name: LOLBas Dxcap Usage
+description: |
+  'Detects Dxcap usage'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1135
+query: |
+  SecurityEvent 
+  | where EventID == 4688
+  | where (CommandLine matches regex "(?i).*dxcap.exe.*.exe.*" and (CommandLine contains "-c" or CommandLine contains "/c"))
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

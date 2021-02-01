@@ -1,0 +1,1 @@
+Possible payload delivery via WMI (Cobalt Strike)

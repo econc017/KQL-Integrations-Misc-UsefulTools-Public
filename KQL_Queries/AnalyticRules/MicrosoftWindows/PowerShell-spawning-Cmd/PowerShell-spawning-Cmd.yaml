@@ -1,0 +1,29 @@
+name: PowerShell spawning Cmd
+description: |
+  'Identifies a suspicious parent child process relationship with cmd.exe descending from PowerShell.exe.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1059
+  - T1086
+query: |
+  SecurityEvent | where EventID == 4688 and ParentProcessName contains "powershell.exe" and Process == "cmd.exe" | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

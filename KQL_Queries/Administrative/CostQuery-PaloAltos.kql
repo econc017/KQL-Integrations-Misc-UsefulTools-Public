@@ -1,0 +1,10 @@
+//To be used with the CEF connector in Sentinel
+//Will display the billable cost according to the DeviceVendor field, displaying billable GBs and basing estimated cost off of $4 a Gigabite for the last 30 days.
+let deviceVendor_custom1 = "Palo Alto Networks";
+let deviceVendor_custom2 = "Palo Alto#012Networks";
+let costPerGig = 4.0;
+CommonSecurityLog
+| where TimeGenerated >= ago(30d)
+| where DeviceVendor in (deviceVendor_custom1, deviceVendor_custom2)
+| summarize Count = count(), BilledSize= sum(_BilledSize) by DeviceVendor, DeviceName, Activity
+| project DeviceVendor, DeviceName, Activity, Count, BilledSizeGB=BilledSize/(1024*1024*1024), EstimatedCost=(BilledSize/(1024*1024*1024)) * costPerGig

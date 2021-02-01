@@ -1,0 +1,33 @@
+name: Cmd-Executed-From-StartUp
+description: |
+  'Detects if batch script was from StartUp folder, this indicates a batch script was dropped to maintain Persistence as the script will execute upon machine boot.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+  - TA0005
+query: |
+  SecurityEvent
+  | where EventID == "4688"
+  | where CommandLine contains "StartUp"
+  | where AccountType == "User"
+  | extend AccountCustomEntity = Account
+  | extend HostCustomEntity = Computer

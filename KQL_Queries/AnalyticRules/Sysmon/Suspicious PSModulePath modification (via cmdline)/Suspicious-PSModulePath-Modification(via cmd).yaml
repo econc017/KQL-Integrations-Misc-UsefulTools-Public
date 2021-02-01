@@ -1,0 +1,29 @@
+name: Suspicious PSModule Path Modification Via cmd
+description: |
+  'Suspicious PSModule Path Modification Via cmd'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+  - Persistence
+relevantTechniques:
+query: |
+  Sysmon 
+  | where ((CommandLine contains "SetEnvironmentVariable" and CommandLine contains "PSModulePath") or (CommandLine contains "env:PSModulePath" and CommandLine contains "="))

@@ -1,0 +1,37 @@
+name: Wmiexec Via Impacket
+description: |
+  'Windows Management Instrumentation (WMI) is a Windows administration feature that provides a uniform environment for local and remote access
+  to Windows system components. It relies on the WMI service for local and remote access and the server message block (SMB)
+  and Remote Procedure Call Service (RPCS) [2] for remote access. RPCS operates over port 135.An adversary can use WMI to interact with local
+  and remote systems and use it as a means to perform many tactic functions, such as gathering information for Discovery 
+  and remote Execution of files as part of Lateral Movement. This Specific alert is tailored to the wmiexec.py tool from the impacket framework.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+- T1047
+query: |
+  SecurityEvent
+  | where EventID == "4688"
+  | where Channel == "Security"
+  | where CommandLine contains "cmd" and CommandLine contains "\\\\127.0.0.1\\"
+  | extend HostCustomEntity = Computer
+  | extend AccountCustomEntity = UserName

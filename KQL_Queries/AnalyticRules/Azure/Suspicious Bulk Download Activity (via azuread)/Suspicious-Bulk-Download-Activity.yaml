@@ -1,0 +1,29 @@
+name: Suspicious Bulk Download Activity
+description: |
+  'Detects Suspicious Bulk Download Activity'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AuditLogs
+    dataTypes:
+      - AuditLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Exfiltration
+relevantTechniques:
+query: |
+  AuditLogs 
+  | where (LoggedByService == "AAD Management UX" and Result == "success" and OperationName contains "Download" and OperationName contains "bulk")
+

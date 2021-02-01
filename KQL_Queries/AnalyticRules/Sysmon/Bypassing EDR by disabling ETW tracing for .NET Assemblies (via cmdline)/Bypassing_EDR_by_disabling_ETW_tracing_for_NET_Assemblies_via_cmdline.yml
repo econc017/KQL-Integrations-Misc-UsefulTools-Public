@@ -1,0 +1,29 @@
+name: Bypassing EDR by disabling ETW tracing
+description: |
+  'Detects Bypassing EDR by disabling ETW tracing'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+  - DefenseEvasion
+relevantTechniques:
+query: |
+  Sysmon 
+  | where (CommandLine contains "set" and CommandLine contains "COMPlus_ETWEnabled" and (CommandLine contains "0" or CommandLine contains "false"))

@@ -1,0 +1,33 @@
+name: User Added To Admin Grp
+description: |
+  'Detects When user is added to a domain group that contains the word admin (Enterprise Admins,Domain Admins,DNS Admins)'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+  - T000
+query: |
+  SecurityEvent
+  | where EventID == 4728
+  | where TargetUserName contains "Admin" 
+  or TargetUserName contains "admin"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

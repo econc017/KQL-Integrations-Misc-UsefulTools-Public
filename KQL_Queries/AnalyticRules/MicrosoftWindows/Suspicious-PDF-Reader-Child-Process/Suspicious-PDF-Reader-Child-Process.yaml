@@ -1,0 +1,30 @@
+name: Suspicious PDF Reader Child Process
+description: |
+  'Identifies suspicious child processes of PDF reader applications. These child processes are often launched via exploitation of PDF applications or social engineering.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1204
+query: |
+  SecurityEvent | where EventID == 4688 and (ParentProcessName contains "AcroRd32.exe" or ParentProcessName contains "Acrobat.exe" or ParentProcessName contains "FoxitPhantomPDF.exe" or ParentProcessName contains "FoxitReader.exe") and (Process == "arp.exe" or Process == "dsquery.exe" or Process == "dsget.exe" or Process == "gpresult.exe" or Process == "hostname.exe" or Process == "ipconfig.exe" or Process == "nbtstat.exe" or Process == "net.exe" or Process == "net1.exe" or Process == "netsh.exe" or Process == "netstat.exe" or Process == "nltest.exe" or Process == "ping.exe" or Process == "qprocess.exe" or Process == "quser.exe" or Process == "qwinsta.exe" or Process == "reg.exe" or Process == "sc.exe" or Process == "systeminfo.exe" or Process == "tasklist.exe" or Process == "tracert.exe" or Process == "whoami.exe" or Process == "bginfo.exe" or Process == "cdb.exe" or Process == "cmstp.exe" or Process == "csi.exe" or Process == "dnx.exe" or Process == "fsi.exe" or Process == "ieexec.exe" or Process == "iexpress.exe" or Process == "installutil.exe" or Process == "Microsoft.Workflow.Compiler.exe" or Process == "msbuild.exe" or Process == "mshta.exe" or Process == "msxsl.exe" or Process == "odbcconf.exe" or Process == "rcsi.exe" or Process == "regsvr32.exe" or Process == "xwizard.exe" or Process == "atbroker.exe" or Process == "forfiles.exe" or Process == "schtasks.exe" or Process == "regasm.exe" or Process == "regsvcs.exe" or Process == "cmd.exe" or Process == "cscript.exe" or Process == "powershell.exe" or Process == "pwsh.exe" or Process == "wmic.exe" or Process == "wscript.exe" or Process == "bitsadmin.exe" or Process == "certutil.exe" or Process == "ftp.exe")
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

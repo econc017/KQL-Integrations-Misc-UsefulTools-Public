@@ -1,0 +1,3 @@
+SecurityEvent 
+| where EventID == 4688  
+| where (NewProcessName contains "\forfiles.exe" and (CommandLine contains "/c " or CommandLine contains "-c "))

@@ -1,0 +1,34 @@
+name: Potential DSRMP Persistence
+description: |
+  'DSRM Persistence https://adsecurity.org/?p=1785'
+severity: low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1222
+query: |
+  SecurityEvent
+  | where EventID == "4657" 
+  or EventID == "4656" 
+  or EventID == "4678"
+  | where ObjectName contains "\\REGISTRY\\MACHINE\\SYSTEM\\ControlSet001\\Control\\Lsa\\DSRMADMINLOGONBEHAVIOR"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

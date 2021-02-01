@@ -1,0 +1,33 @@
+name: AzureTokenReq Not Via Chrome
+description: |
+  'Technique explained here => https://dirkjanm.io/abusing-azure-ad-sso-with-the-primary-refresh-token/'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - CredentialAccess
+relevantTechniques:
+  - T1135
+query: |
+  SecurityEvent
+  | where NewProcessName contains "BrowserCore.exe" and ParentProcessName !contains "cmd.exe" 
+  or NewProcessName contains "cmd.exe" and ParentProcessName contains "chrome.exe" and CommandLine !contains "\\\\.\\pipe\\"
+  | sort by TimeGenerated
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

@@ -1,0 +1,18 @@
+SecurityEvent 
+| where (CommandLine contains "GetTypeFromCLSID" 
+          or CommandLine contains "System.Runtime.InteropServices.Marshal" 
+          or CommandLine contains "System.Windows.Forms.Clipboard" 
+          or CommandLine contains "System.Net.Sockets.TcpListener" 
+          or CommandLine contains "Reflection.Assembly" 
+          or CommandLine contains "Net.Sockets.SocketFlags" 
+          or CommandLine contains "System.Security.Cryptography" 
+          or CommandLine contains "System.IO.File" 
+          or CommandLine contains "ReadAllBytes" 
+          or CommandLine contains "System.Reflection.Assembly" 
+          or CommandLine contains "AssemblyBuilderAccess" 
+          or CommandLine contains "SuspendThread" 
+          or CommandLine contains "Runtime.InteropServices.DllImportAttribute" 
+          or CommandLine contains "Reflection.Emit.AssemblyBuilderAccess" 
+          or CommandLine contains "System.Reflection.AssemblyName" 
+          or CommandLine contains "DownloadString" 
+          or CommandLine contains "DownloadFile")

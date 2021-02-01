@@ -1,0 +1,16 @@
+{
+  "Defender": {
+    "authority": "https://login.microsoftonline.us/DOMAIN.COM",
+    "client_id": "38a***",
+    "scope": [
+      "https://graph.windows.net/.default"
+    ],
+    "secret": "GFc***",
+    "endpoint": "https://wdatp-alertexporter-us.securitycenter.windows.us/api/Alerts?limit=20&ago=PT30M"
+  },
+  "LogAnalytics": {
+    "WORKSPACE_ID": "632***",
+    "WORKSPACE_SHARED_KEY": "Yi6***",
+    "CUSTOM_TABLE_NAME": "DefenderAlertTest"
+  }
+}

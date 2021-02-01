@@ -1,0 +1,30 @@
+name: Add Global Admin AAD (PIM)
+description: |
+  'Detects when user is granted global admin via PIM eligibility or perm active status'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AuditLogs
+    dataTypes:
+      - AuditLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - PrivilegeEscalation
+relevantTechniques:
+query: |
+  AuditLogs
+  | sort by TimeGenerated
+  | where AADOperationType == "CreateRequestPermanentEligibleRole" or "AssignPermanentGrantedRole"
+  | where TargetResources[0].displayName contains "Global Admin"

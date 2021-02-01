@@ -1,0 +1,30 @@
+name: Multiple Lows in 24 hours
+description: |
+  'This rule was made to detect multiple low events from MDATP and MCAS in the past 24 hours, to be escalated to a High event. HostName has been extended to be able to filter by host.'
+severity: high
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityAlerts
+    dataTypes:
+      - SecurityAlert
+      - SecurityDetection
+queryFrequency: 24h
+queryPeriod: 24h
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 3
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+  - CredentialAccess
+relevantTechniques:
+  - T1135
+query: |
+  let timeFrame = 1d; let notempty_hostname = () { SecurityAlert | union SecurityDetection | where TimeGenerated >= ago(timeFrame) | where not(ProviderName == "ASI Scheduled Alerts" or ProviderName == "AntimalwarePublisher" or Provider == "AntimalwarePublisher") and AlertSeverity == "Low" | extend HostCustomEntity = tostring(parse_json(Entities)[0].HostName) }; let empty_hostname = () { SecurityAlert | union SecurityDetection | where TimeGenerated >= ago(timeFrame) | where not(ProviderName == "ASI Scheduled Alerts" or ProviderName == "AntimalwarePublisher" or Provider == "AntimalwarePublisher") and AlertSeverity == "Low" | extend HostCustomEntity = tostring(parse_json(Entities)[0].HostName) | where HostCustomEntity == "" | extend HostCustomEntity = tostring(parse_json(ExtendedProperties).["Compromised Host"]) }; empty_hostname | union notempty_hostname

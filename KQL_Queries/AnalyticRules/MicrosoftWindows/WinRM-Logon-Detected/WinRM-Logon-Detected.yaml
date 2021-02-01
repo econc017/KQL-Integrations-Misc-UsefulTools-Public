@@ -1,0 +1,35 @@
+name: WinRM Logon Detected
+description: |
+  'Detects when the  powershell remoting process is started by a specific user, This indicates the user has a remote shell on the machine via Evil-WinRM or powershell remoting'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - LateralMovement
+relevantTechniques:
+  - T1086
+query: |
+  SecurityEvent
+  | where EventID == "4688"
+  | where CommandLine == "C:\\windows\\system32\\wsmprovhost.exe -Embedding"
+  | sort by TimeGenerated
+  | project TimeGenerated,TargetUserName,Account,Computer,CommandLine
+  | project-rename RemotingUser = TargetUserName
+  | extend HostCustomEntity = Computer
+  | extend AccountCustomEntity = UserName

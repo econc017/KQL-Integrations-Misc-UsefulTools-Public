@@ -1,0 +1,32 @@
+name: Potential Application Shimming via Sdbinst
+description: |
+  'The Application Shim was created to allow for backward compatibility of software as the operating system codebase changes over time. This Windows functionality has been abused by attackers to stealthily gain persistence and arbitrary code execution in legitimate Windows processes.'
+severity: low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+  - PrivilegeEscalation
+relevantTechniques:
+  - T1138
+query: |
+  SecurityEvent 
+  | where EventID == 4688 and Process == "sdbinst.exe" 
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

@@ -1,0 +1,29 @@
+name: Possible Cobalt Strike payload delivery via WMI
+description: |
+  'Cobalt Strike can use PowerShell to bootstrap a payload on target'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1086
+  - T1047
+query: |
+  SecurityEvent | where ParentProcessName contains "WmiPrvSE.exe" and CommandLine contains "powershell.exe" and (CommandLine contains "Value" or CommandLine contains "env" or CommandLine contains "IE" or CommandLine contains "-w hidden -encodedcommand") | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

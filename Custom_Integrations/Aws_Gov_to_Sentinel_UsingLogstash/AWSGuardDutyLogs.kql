@@ -1,0 +1,12 @@
+let GuardDutyLogs = 
+AWSCloudLogs_CL
+| where tags_s contains "GuardDuty"
+| extend
+CreatedAt = tostring(parse_json(Message).createdAt),
+Description = tostring(parse_json(Message).description),
+Region = tostring(parse_json(Message).region),
+Severity = tostring(parse_json(Message).severity),
+Title = extractjson("$.title",Message),
+Type = tostring(parse_json(Message).type)
+;
+GuardDutyLogs

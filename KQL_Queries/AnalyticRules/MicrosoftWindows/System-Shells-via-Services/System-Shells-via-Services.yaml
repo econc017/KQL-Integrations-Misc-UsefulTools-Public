@@ -1,0 +1,28 @@
+name: System Shells via Services
+description: |
+  'Windows services typically run as SYSTEM and can be used as a privilege escalation opportunity. Malware or penetration testers may run a shell as a service to gain SYSTEM permissions.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1050
+query: |
+  SecurityEvent | where EventID == 4688 and ParentProcessName contains "services.exe" and (Process == "cmd.exe" or Process == "powershell.exe") | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

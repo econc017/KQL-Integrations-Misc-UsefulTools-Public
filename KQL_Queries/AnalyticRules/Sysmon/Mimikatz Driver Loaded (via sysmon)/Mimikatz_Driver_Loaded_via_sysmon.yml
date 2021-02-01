@@ -1,0 +1,28 @@
+name: Mimikatz driver loaded 
+description: |
+  'Detects mimikatz driver loaded'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+query: |
+  Sysmon 
+  | where (EventID == "6" and (TargetFilename contains "mimidrv"))

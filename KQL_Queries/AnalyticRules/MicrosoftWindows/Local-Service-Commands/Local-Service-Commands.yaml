@@ -1,0 +1,38 @@
+name: Local Service Commands
+description: |
+  'Identifies use of sc.exe to create, modify, or start services on remote hosts. This could be indicative of adversary lateral movement but will be noisy if commonly done by admins.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1021
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where AccountType == "User"
+  | where Process == "sc.exe"
+  | where EventID == "4688"
+  | where CommandLine contains "create"
+  or CommandLine contains "config"
+  or CommandLine contains "start"
+  or CommandLine contains "failure"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

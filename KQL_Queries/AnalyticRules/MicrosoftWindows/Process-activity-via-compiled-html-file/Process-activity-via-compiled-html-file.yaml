@@ -1,0 +1,29 @@
+name: Process Activity via Compiled HTML File
+description: |
+  'Compiled HTML files (.chm) are commonly distributed as part of the Microsoft HTML Help system. Adversaries may conceal malicious code in a CHM file and deliver it to a victim for execution. CHM content is loaded by the HTML Help executable program (hh.exe).'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+  - DefenseEvasion
+relevantTechniques:
+  - T1223
+query: |
+  SecurityEvent | where EventID == 4688 and Process == "hh.exe" | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

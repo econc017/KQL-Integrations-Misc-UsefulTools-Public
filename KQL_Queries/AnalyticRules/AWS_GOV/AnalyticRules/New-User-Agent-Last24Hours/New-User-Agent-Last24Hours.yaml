@@ -1,0 +1,64 @@
+name: AWS New User Agent Last 24Hours
+description: 'Identifies new UserAgents observed in the last 24 hours versus the previous 14 days'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - CredentialAccess
+relevantTechniques:
+query: |
+  let starttime = 14d;
+  let endtime = 1d;
+  let UserAgentAll = 
+  (union isfuzzy=true
+  (OfficeActivity
+  | where TimeGenerated >= ago(starttime)
+  | where isnotempty(UserAgent)
+  | summarize StartTime = min(TimeGenerated), EndTime = max(TimeGenerated) by UserAgent, SourceIP = ClientIP, Account = UserId, Type, RecordType, Operation
+  ),
+  (
+  W3CIISLog
+  | where TimeGenerated >= ago(starttime)
+  | where isnotempty(csUserAgent)
+  | summarize StartTime = min(TimeGenerated), EndTime = max(TimeGenerated) by UserAgent = csUserAgent, SourceIP = cIP, Account = csUserName, Type, sSiteName, csMethod, csUriStem
+  ),
+  (
+  AWSCloudTrailLogs
+  | where TimeGenerated >= ago(starttime)
+  | where isnotempty(UserAgent)
+  | summarize StartTime = min(TimeGenerated), EndTime = max(TimeGenerated) by UserAgent, SourceIP = SourceIpAddress, Account = UserIdentityUserName, Type, EventSource, EventName
+  ))
+  // remove wordSize blocks of non-numeric hex characters prior to word extraction
+  | extend UserAgentNoHexAlphas = replace("([A-Fa-f]{4,})", "x", UserAgent)
+  // once blocks of hex chars are removed, extract wordSize blocks of a-z
+  | extend Tokens = extract_all("([A-Za-z]{4,})", UserAgentNoHexAlphas)
+  // concatenate extracted words to create a summarized user agent for baseline and comparison
+  | extend NormalizedUserAgent = strcat_array(Tokens, "|")
+  | project-away UserAgentNoHexAlphas, Tokens;
+  UserAgentAll
+  | where StartTime >= ago(endtime)
+  | summarize StartTime = min(StartTime), EndTime = max(EndTime), count() by UserAgent, NormalizedUserAgent, SourceIP, Account, Type, RecordType, Operation, EventSource, EventName, sSiteName, csMethod, csUriStem
+  | join kind=leftanti
+  (
+  UserAgentAll
+  | where StartTime < ago(endtime)
+  | summarize by NormalizedUserAgent, SourceIP, Account, Type, RecordType, Operation, EventSource, EventName, sSiteName, csMethod, csUriStem
+  )
+  on NormalizedUserAgent
+  | extend timestamp = StartTime, IPCustomEntity = SourceIP, AccountCustomEntity = Account

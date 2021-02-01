@@ -1,0 +1,34 @@
+name: AWS Changes Made To VPC
+description: | 
+  'AWS Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+query: |
+  let timeframe = 1d;
+  let EventNameList = dynamic(["CreateNetworkAclEntry","CreateRoute","CreateRouteTable","CreateInternetGateway","CreateNatGateway"]);
+  AWSCloudTrail
+  | where TimeGenerated > ago(timeframe)
+  | where EventName in~ (EventNameList)
+  | summarize StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated) by EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, 
+  UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData, ResponseElements
+  | extend timestamp = StartTimeUtc, AccountCustomEntity = UserIdentityUserName, IPCustomEntity = SourceIpAddress

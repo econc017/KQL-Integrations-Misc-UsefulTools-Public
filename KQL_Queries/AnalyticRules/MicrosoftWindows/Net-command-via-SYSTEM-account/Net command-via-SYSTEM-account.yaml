@@ -1,0 +1,36 @@
+name: Net command via SYSTEM account
+description: |
+  'Identifies the SYSTEM account using the Net utility. The Net utility is a component of the Windows operating system. It is used in command line operations for control of users, groups, services, and network connections.'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Discovery
+relevantTechniques:
+  - T1087
+query: |
+  SecurityEvent
+  | where EventID == "4688"
+  | where Channel == "Security"
+  | where AccountType == "Machine"
+  | where Account contains "$"
+  | where Process contains "net.exe" 
+  or Process contains "net1.exe"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

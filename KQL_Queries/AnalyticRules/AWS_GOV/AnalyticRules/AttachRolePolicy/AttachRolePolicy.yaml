@@ -1,0 +1,34 @@
+name: AWS EventRule AttachRolePolicy
+description: |
+  'AWS A managed policy has been added to an IAM role.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+relevantTechniques:
+query: |
+  AWSCloudWatch_CL
+  | extend Subject_ = tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).Subject)
+  | extend TopicArn_ = tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).TopicArn)
+  | extend Type_ = tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).Type)
+  | extend EventName = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(parse_json(Records_s)[0].Sns)).Message)).detail)).eventName)
+  | where EventName =~ "AttachRolePolicy"
+  | project-away Computer,RawData,_ResourceId,Type
+  | sort by TimeGenerated

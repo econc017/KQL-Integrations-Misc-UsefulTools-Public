@@ -1,0 +1,37 @@
+name: Execution via Regsvcs/Regasm
+description: |
+  'RegSvcs.exe and RegAsm.exe are Windows command line utilities that are used to register .NET Component Object Model (COM) assemblies. Adversaries can use RegSvcs.exe and RegAsm.exe to proxy execution of code through a trusted Windows utility.
+  https://pentestlab.blog/2017/05/19/applocker-bypass-regasm-and-regsvcs/'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1121
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where EventID == "4688"
+  | where AccountType == "User"
+  | where EventID == "4688"
+  | where Process == "RegSvcs.exe"
+  or Process == "RegAsm.exe"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

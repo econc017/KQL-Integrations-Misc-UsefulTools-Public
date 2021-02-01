@@ -1,0 +1,2 @@
+Sysmon 
+| where (EventID == "6" and (TargetFilename contains "mimidrv"))

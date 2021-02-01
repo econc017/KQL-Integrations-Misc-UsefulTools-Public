@@ -1,0 +1,32 @@
+name: AWS EventRule DeleteUser
+description: |
+  'Triggers when create user api call is made.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+query: |
+  AWSCloudTrailLogs
+  | where EventName == "DeleteUser"
+
+
+
+

@@ -1,0 +1,47 @@
+name: AWS Failed AzureAD logons but success logon to AWS Console
+description: |
+  'Identifies a list of IP addresses with a minimum number(defualt of 5) of failed logon attempts to Azure Active Directory. Uses that list to identify any successful AWS Console logons from these IPs within the same timeframe.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - CredentialAccess
+relevantTechniques:
+query: |
+  let signin_threshold = 5; 
+  let Suspicious_signins = 
+  SigninLogs
+  | where TimeGenerated >= ago(1d)
+  | where ResultType !in ("0", "50125", "50140")
+  | where IPAddress != "127.0.0.1"
+  | summarize count() by IPAddress
+  | where count_ >  signin_threshold
+  | summarize make_list(IPAddress);
+  //See if any of those IPs have sucessfully logged into the AWS console
+  AWSCloudTrailLogs
+  | where TimeGenerated > ago(1d)
+  | where EventName =~ "ConsoleLogin"
+  | extend LoginResult = tostring(parse_json(ResponseElements).ConsoleLogin) 
+  | where LoginResult =~ "Success"
+  | where SourceIpAddress in (Suspicious_signins)
+  | extend Reason = "Multiple failed AAD logins from IP address"
+  | extend MFAUsed = tostring(parse_json(AdditionalEventData).MFAUsed)
+  | extend User = iif(isempty(UserIdentityUserName), UserIdentityType, UserIdentityUserName)
+  | summarize StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated) by Reason, LoginResult, EventTypeName, UserIdentityType, User, AWSRegion, SourceIpAddress, UserAgent, MFAUsed
+  | extend timestamp = StartTimeUtc, AccountCustomEntity = User, IPCustomEntity = SourceIpAddress

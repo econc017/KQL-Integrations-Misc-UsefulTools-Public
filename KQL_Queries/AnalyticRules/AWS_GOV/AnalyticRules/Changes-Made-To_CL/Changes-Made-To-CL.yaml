@@ -1,0 +1,34 @@
+name: AWS Changes Made To CL Logs
+description: |
+  'AWS Attackers often try to hide their steps by deleting or stopping the collection of logs that could show their activity. This alert identifies any manipulation of AWS CloudTrail, Cloudwatch/EventBridge or VPC Flow logs.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+relevantTechniques:
+query: |
+  let timeframe = 1d;
+  let EventNameList = dynamic(["UpdateTrail","DeleteTrail","StopLogging","DeleteFlowLogs","DeleteEventBus"]);
+  AWSCloudTrailLogs
+  | where TimeGenerated > ago(timeframe)
+  | where EventName in~ (EventNameList)
+  | summarize StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated) by EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, 
+  UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource
+  | extend timestamp = StartTimeUtc, AccountCustomEntity = UserIdentityUserName, IPCustomEntity = SourceIpAddress

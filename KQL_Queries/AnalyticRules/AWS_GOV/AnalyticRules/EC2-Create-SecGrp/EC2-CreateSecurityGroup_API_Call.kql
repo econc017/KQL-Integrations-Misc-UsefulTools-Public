@@ -1,0 +1,9 @@
+// Description:
+// ec2.amazonaws.com:CreateSecurityGroup
+
+// EC2 create Security Group
+AWSCloudTrailLogs
+| where EventSource == "ec2.amazonaws.com"
+| where EventName == "CreateSecurityGroup"
+| extend AccountCustomEntity = UserIdentityUserName
+| extend IPCustomEntity = SourceIpAddress

@@ -1,0 +1,31 @@
+name: Trusted Developer Application Usage
+description: |
+  'Identifies possibly suspicious activity using a trusted Windows developer utility program.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+    - DefenseEvasion
+relevantTechniques:
+  - T1127
+query: |
+  SecurityEvent | where EventID == 4688 and (Process == "MSBuild.exe" or Process == "msxsl.exe")
+  | extend HostCustomEntity = Computer
+  | extend AccountCustomEntity = UserName

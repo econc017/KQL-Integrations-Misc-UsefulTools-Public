@@ -1,0 +1,2 @@
+AuditLogs 
+| where (LoggedByService == "AAD Management UX" and Result == "success" and OperationName contains "Download" and OperationName contains "bulk")

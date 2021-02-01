@@ -1,0 +1,28 @@
+name: Process Discovery via Tasklist
+description: |
+  'Adversaries may attempt to get information about running processes on a system'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Discovery
+relevantTechniques:
+  - T1057
+query: |
+  SecurityEvent | where EventID == 4688 and Process == "tasklist.exe" | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

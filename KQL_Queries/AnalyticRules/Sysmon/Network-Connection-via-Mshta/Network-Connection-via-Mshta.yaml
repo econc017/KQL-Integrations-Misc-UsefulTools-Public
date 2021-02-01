@@ -1,0 +1,30 @@
+name: Network Connection via Mshta
+description: |
+  'Identifies mshta.exe making a network connection. This may indicate adversarial activity as mshta.exe is often leveraged by adversaries to execute malicious scripts and evade detection.'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1170
+query: |
+  Sysmon
+  | where EventID == "3"
+  | where Image == "C:\\windows\\system32\\mshta.exe"

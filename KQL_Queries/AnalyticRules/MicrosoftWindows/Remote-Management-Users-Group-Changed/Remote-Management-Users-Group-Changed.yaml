@@ -1,0 +1,34 @@
+name: RemoteManagementUsers Group Changed
+description: |
+  'Detects when changes are made to the RemoteManagementUsers group in AD, this group allows users to login via WinRM and RDP'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - LateralMovement
+relevantTechniques:
+  - T1086
+query: |
+  SecurityEvent
+  | sort by TimeGenerated
+  | where EventID == "4735"
+  | where TargetUserName == "Remote Management Users"
+  | project TimeGenerated,Account,Computer,TargetUserName,Activity,EventData
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

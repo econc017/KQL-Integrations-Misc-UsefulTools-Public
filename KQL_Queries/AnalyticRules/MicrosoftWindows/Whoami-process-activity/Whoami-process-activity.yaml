@@ -1,0 +1,30 @@
+name: Whoami process activity
+description: |
+  'Identifies use of whoami.exe which displays user, group, and privileges information for the user who is currently logged on to the local system.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Discovery
+relevantTechniques:
+  - T1033
+query: |
+  SecurityEvent | where EventID == 4688 and Process == "whoami.exe"
+  | extend HostCustomEntity = Computer
+  | extend AccountCustomEntity = UserName

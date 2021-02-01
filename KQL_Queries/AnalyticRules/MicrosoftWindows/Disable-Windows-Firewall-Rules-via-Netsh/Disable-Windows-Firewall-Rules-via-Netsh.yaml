@@ -1,0 +1,36 @@
+name: Disable Windows Firewall Rules Via Netsh
+description: |
+  'Identifies use of the netsh.exe to disable or weaken the local firewall. Attackers will use this command line tool to disable the firewall during troubleshooting or to enable network mobility.'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+relevantTechniques:
+  - T1089
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where EventID == "4688"
+  | where CommandLine contains "netsh"
+  and CommandLine contains "off" 
+  or CommandLine contains "netsh"
+  and CommandLine contains "disable"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

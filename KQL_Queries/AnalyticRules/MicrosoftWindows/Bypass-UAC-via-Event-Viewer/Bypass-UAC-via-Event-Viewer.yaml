@@ -1,0 +1,29 @@
+name: Bypass UAC via Event Viewer
+description: |
+  'Identifies User Account Control (UAC) bypass via eventvwr.exe. Attackers bypass UAC to stealthily execute code with elevated permissions.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - PrivilegeEscalation
+relevantTechniques:
+  - T1088
+query: |
+  Sysmon
+  | where ParentImage == "C:\\Windows\\System32\\eventvwr.exe" and Image != "C:\\Windows\\System32\\mmc.exe"

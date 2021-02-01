@@ -1,0 +1,31 @@
+name: LOLBas Diskshadow usage
+description: |
+  'Detects Diskshadow usage'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+query: |
+  SecurityEvent 
+  | where EventID == 4688  
+  | where ParentProcessName contains "\\diskshadow.exe"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

@@ -1,0 +1,33 @@
+name: Powershell Encoded Command Alias Detected
+description: |
+  'Powershell Encoded Command Alias Detection, This technique is used to bypass Detection via Alias usages'
+severity: medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1047
+query: |
+  SecurityEvent
+  | where EventID == "4688"
+  | where CommandLine contains "-ea"
+  or CommandLine contains "-ec"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

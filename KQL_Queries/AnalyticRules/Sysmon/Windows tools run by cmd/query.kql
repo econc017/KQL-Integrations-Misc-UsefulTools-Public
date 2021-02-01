@@ -1,0 +1,17 @@
+Sysmon 
+| where (EventID == "1" 
+    and (ParentImage endswith @"\\cmd.exe") 
+    and (ParentCommandLine endswith @"\\cmd.exe") 
+    and (CommandLine == "dcomcnfg" 
+        or CommandLine == "eventvwr" 
+        or CommandLine == "iexpress" 
+        or CommandLine == "iexplore" 
+        or CommandLine == "msconfig" 
+        or CommandLine == "mstsc" 
+        or CommandLine == "optionalfeatures" 
+        or CommandLine == "regedit" 
+        or CommandLine == "shrpubw" 
+        or CommandLine == "snippingtool" 
+        or CommandLine == "telnet" 
+        or CommandLine == "snippingtool" 
+        or CommandLine == "winver"))

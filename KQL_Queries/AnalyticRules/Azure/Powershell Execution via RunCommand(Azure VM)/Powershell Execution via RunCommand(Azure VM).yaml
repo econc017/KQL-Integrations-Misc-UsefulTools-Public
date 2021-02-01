@@ -1,0 +1,26 @@
+name: Powershell Execution via RunCommand(Azure VM)
+description: |
+  'Detects Run Commands as system from azure RunCommand VM feature'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvents
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - PrivilegeEscalation
+relevantTechniques:
+query:  "letVmLog = (SecurityEvent | where ParentProcessName == \"C:\\Packages\\Plugins\\Microsoft.CPlat.Core.RunCommandWindows\\1.1.5\\bin\\RunCommandExtension.exe\"); \n AzureActivity \n | where OperationName == \"Run Command on Virtual Machine\" \n | where ActivityStatus == \"Succeeded\" \n |	union (VmLog) \n | project TimeGenerated,ActivityStatus,Caller,SubjectAccount,CommandLine,Computer,Resource,OperationName,OperationNameValue,ResourceGroup,ParentProcessName "

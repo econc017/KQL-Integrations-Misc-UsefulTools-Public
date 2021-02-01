@@ -1,0 +1,33 @@
+name: Possible-SMBv1-Anonymous-Enumeration
+description: |
+  'Detects SMB Anonymous logins, this alert is caused by tools such as smbclient\rpcclient\smbMap'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Discovery
+relevantTechniques:
+  - T1135
+query: |
+  SecurityEvent
+  | where Account contains "NT AUTHORITY\\ANONYMOUS LOGON"
+  | where EventID == "4723" or EventID == "4624"
+  | sort by TimeGenerated 
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

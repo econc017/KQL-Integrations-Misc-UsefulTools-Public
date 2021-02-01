@@ -1,0 +1,2 @@
+SecurityEvent 
+| where (EventID == "4724" and (SubjectUserName contains "adm") and (TargetUserName contains "adm"))

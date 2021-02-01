@@ -1,0 +1,7 @@
+Sysmon 
+| where (EventID == "13" and (TargetObject endswith @"\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\\EnableScriptBlockLogging" 
+        or TargetObject endswith @"\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\\EnableScriptBlockInvocationLogging" 
+        or TargetObject endswith @"\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\\EnableScriptBlockLogging" 
+        or TargetObject endswith @"\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\\EnableScriptBlockInvocationLogging") 
+        and (Details == "0") 
+        and EventType == "SetValue")

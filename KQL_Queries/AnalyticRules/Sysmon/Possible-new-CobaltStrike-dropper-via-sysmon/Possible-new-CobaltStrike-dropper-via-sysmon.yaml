@@ -1,0 +1,28 @@
+name:  Possible new Cobalt Strike dropper using sysmon data
+description: |
+  'Detects the attempts of some threat actors to drop Cobalt Strike into a victim machine via Microsoft Word macros.'
+severity: high
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1135
+query: |
+  Sysmon | where (EventID == 11 and (TargetFilename contains "Ecmd.exe" or TargetFilename contains "ecmd.exe" or TargetFilename contains "ecmd.exe.lnk" or TargetFilename contains "cf.ini")) | extend AccountCustomEntity = UserName | extend HostCustomEntity = Computer

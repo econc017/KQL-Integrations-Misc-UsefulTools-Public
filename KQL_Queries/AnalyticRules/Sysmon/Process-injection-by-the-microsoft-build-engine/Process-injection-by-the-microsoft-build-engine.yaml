@@ -1,0 +1,29 @@
+name: Process Injection by the Microsoft Build Engine
+description: |
+  'An instance of MSBuild, the Microsoft Build Engine, created a thread in another process. This technique is sometimes used to evade detection or elevate privileges.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+  - PrivilegeEscalation
+relevantTechniques:
+  - T1055
+query: |
+  Sysmon | where EventID == 8 | where SourceImage contains "cscript.exe" | extend AccountCustomEntity = UserName | extend HostCustomEntity = Computer

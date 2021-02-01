@@ -1,0 +1,27 @@
+name: Trojan:EC2/BlackholeTraffic
+description: |
+  'GuardDuty Alert Trojan:EC2/BlackholeTraffic'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSGuardDutyLog
+    dataTypes:
+      - AWSGuardDutyLog
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+relevantTechniques:
+query: |
+    AWSGuardDutyLog
+    | where Type == "Trojan:EC2/BlackholeTraffic"

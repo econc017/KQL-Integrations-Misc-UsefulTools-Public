@@ -1,0 +1,30 @@
+name: Possible CobaltStrike execute-assembly execution
+description: |
+  'NoPowerShell is a tool implemented in C# which supports executing PowerShell-like commands while remaining invisible to any PowerShell logging mechanisms.'
+severity: high
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+  - Execution
+relevantTechniques:
+  - T1055
+  - T1086
+query: |
+  Sysmon | where (EventID == 8 and StartAddress contains "0B80") | extend AccountCustomEntity = UserName | extend HostCustomEntity = Computer

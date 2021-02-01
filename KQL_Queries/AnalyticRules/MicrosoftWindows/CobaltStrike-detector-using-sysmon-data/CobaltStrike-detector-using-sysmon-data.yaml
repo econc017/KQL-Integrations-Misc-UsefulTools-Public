@@ -1,0 +1,28 @@
+name: Cobalt Strike detector using sysmon data
+description: |
+  'Cobalt Strike is threat emulation software. This rule will find its hash from Sysmon logs.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1204
+query: |
+  Sysmon | where (EventID == 1 and (Hashes contains "638b7b0536217c8923e856f4138d9caff7eb309d" or Hashes contains "d30e8c7543adbc801d675068530b57d75cabb13f" or Hashes contains "973b1ca8661be6651114edf29b10b31db4e218f7" or Hashes contains "691686839681adb345728806889925dc4eddb74e" or Hashes contains "3cf4b44c9470fb5bd0c16996c4b2a338502a7517" or Hashes contains "d8ef1c4f64a05b1abf100044fcb7048c9526d175a114cb90bd134b80783da146" or Hashes contains "5620e52094d75d3d8c47d4daade74fa45301e347" or Hashes contains "ad3b4198ce49b70d8bb804daf9741660" or Hashes contains "2e0cc6890fbf7a469d6c0ae70b5859e7" or Hashes contains "f360d41a0b42b129f7f0c29f98381416" or Hashes contains "d46df9eacfe7ff75e098942e541d0f18")) | extend AccountCustomEntity = User | extend HostCustomEntity = Computer

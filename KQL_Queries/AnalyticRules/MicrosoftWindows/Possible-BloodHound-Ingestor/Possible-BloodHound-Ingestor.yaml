@@ -1,0 +1,31 @@
+name: Possible Bloodhound and Sharphound Ingestor
+description: |
+  'Detects command line parameters used by Bloodhound and Sharphound'
+severity: high
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Discovery
+relevantTechniques:
+  - T1135
+query: |
+  SecurityEvent 
+  | where ((NewProcessName contains "\\Bloodhound.exe" or NewProcessName contains "\\SharpHound.exe") or (CommandLine contains " -CollectionMethod All "or CommandLine contains ".exe -c All -d " or CommandLine contains "Invoke-Bloodhound" or CommandLine contains "Get-BloodHoundData") or (CommandLine contains " -JsonFolder" and CommandLine contains " -ZipFileName ") or (CommandLine contains " DCOnly " and CommandLine contains " --NoSaveCache "))
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

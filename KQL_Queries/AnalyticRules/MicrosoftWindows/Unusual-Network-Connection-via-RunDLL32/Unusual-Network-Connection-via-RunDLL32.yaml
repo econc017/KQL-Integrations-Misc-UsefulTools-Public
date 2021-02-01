@@ -1,0 +1,28 @@
+name: Unusual Network Connection via RunDLL32
+description: |
+  'Identifies unusual instances of rundll32.exe making outbound network connections. This may indicate adversarial activity and may identify malicious DLLs'
+severity: low
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1085
+query: |
+  Sysmon | where Image contains "rundll32.exe" and EventID == 3 and not(DestinationIp == "10.0.0.0/8" or DestinationIp == "172.16.0.0/12" or DestinationIp == "192.168.0.0/16" or DestinationIp == "127.0.0.0/8")

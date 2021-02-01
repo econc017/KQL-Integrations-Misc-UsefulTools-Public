@@ -1,0 +1,8 @@
+// Non-Compliant Config Rules
+AWSCloudTrailLogs
+| where EventSource == "config.amazonaws.com"
+| where EventName == "PutEvaluations"
+| extend complianceType_ = tostring(parse_json(tostring(parse_json(RequestParameters).evaluations))[0].complianceType)
+| where complianceType_ != "COMPLIANT"
+| extend configRuleName_ = tostring(parse_json(AdditionalEventData).configRuleName)
+| sort by TimeGenerated

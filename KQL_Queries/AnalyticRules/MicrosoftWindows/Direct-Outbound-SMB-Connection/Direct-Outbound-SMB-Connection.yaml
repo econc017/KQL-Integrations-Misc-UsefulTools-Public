@@ -1,0 +1,32 @@
+name: Direct Outbound SMB Connection
+description: |
+  'Identifies unexpected processes making network connections over port 445. Windows File Sharing is typically implemented over Server Message Block (SMB), which communicates between hosts using port 445. When legitimate, these network connections are established by the kernel. Processes making 445/tcp connections may be port scanners, exploits, or suspicious user-level processes moving laterally.'
+severity: High
+enabled: false
+requiredDataConnectors:
+  - connectorId: Sysmon
+    dataTypes:
+      - Sysmon
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - LateralMovement
+relevantTechniques:
+query: |
+  Sysmon
+  | where EventID == "3"
+  | where DestinationPort == "445"
+  | where ProcessId != "4"
+  | where DestinationIp != "127.0.0.1" 
+  or DestinationIp != "::1"

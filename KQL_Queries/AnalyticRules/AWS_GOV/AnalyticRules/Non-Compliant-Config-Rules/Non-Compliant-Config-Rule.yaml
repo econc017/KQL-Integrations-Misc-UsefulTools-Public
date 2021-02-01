@@ -1,0 +1,32 @@
+name: AWS 'Non-Compliant Config rules
+description: 'Non-Compliant Config Rules'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: AWSCloudTrailLogs
+    dataTypes:
+      - AWSCloudTrailLogs
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - CredentialAccess
+relevantTechniques:
+query: |
+  AWSCloudTrailLogs
+  | where EventSource == "config.amazonaws.com"
+  | where EventName == "PutEvaluations"
+  | extend complianceType_ = tostring(parse_json(tostring(parse_json(RequestParameters).evaluations))[0].complianceType)
+  | where complianceType_ != "COMPLIANT"
+  | extend configRuleName_ = tostring(parse_json(AdditionalEventData).configRuleName)
+  | sort by TimeGenerated

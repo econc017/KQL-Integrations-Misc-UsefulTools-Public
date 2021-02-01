@@ -1,0 +1,30 @@
+name: Suspicious MS Office Child Process
+description: |
+  'Identifies suspicious child processes of frequently targeted Microsoft Office applications (Word, PowerPoint, Excel). These child processes are often launched during exploitation of Office applications or from documents with malicious macros.'
+severity: Low
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1193
+query: |
+  SecurityEvent | where EventID == 4688 and (ParentProcessName contains "eqnedt32.exe" or ParentProcessName contains "excel.exe" or ParentProcessName contains "fltldr.exe" or ParentProcessName contains "msaccess.exe" or ParentProcessName contains "mspub.exe" or ParentProcessName contains "powerpnt.exe" or ParentProcessName contains "winword.exe") and (Process == "Microsoft.Workflow.Compiler.exe" or Process == "arp.exe" or Process == "atbroker.exe" or Process == "bginfo.exe" or Process == "bitsadmin.exe" or Process == "cdb.exe" or Process == "certutil.exe" or Process == "cmd.exe" or Process == "cmstp.exe" or Process == "cscript.exe" or Process == "csi.exe" or Process == "dnx.exe" or Process == "dsget.exe" or Process == "dsquery.exe" or Process == "forfiles.exe" or Process == "fsi.exe" or Process == "ftp.exe" or Process == "gpresult.exe" or Process == "hostname.exe" or Process == "ieexec.exe" or Process == "iexpress.exe" or Process == "installutil.exe" or Process == "ipconfig.exe" or Process == "mshta.exe" or Process == "msxsl.exe" or Process == "nbtstat.exe" or Process == "net.exe" or Process == "net1.exe" or Process == "netsh.exe" or Process == "netstat.exe" or Process == "nltest.exe" or Process == "odbcconf.exe" or Process == "ping.exe" or Process == "powershell.exe" or Process == "pwsh.exe" or Process == "process.exe" or Process == "quser.exe" or Process == "qwinsta.exe" or Process == "rcsi.exe" or Process == "reg.exe" or Process == "regasm.exe" or Process == "regsvcs.exe" or Process == "regsvr32.exe" or Process == "sc.exe" or Process == "schtasks.exe" or Process == "systeminfo.exe" or Process == "tasklist.exe" or Process == "tracert.exe" or Process == "whoami.exe" or Process == "wmic.exe" or Process == "wscript.exe" or Process == "xwizard.exe")
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

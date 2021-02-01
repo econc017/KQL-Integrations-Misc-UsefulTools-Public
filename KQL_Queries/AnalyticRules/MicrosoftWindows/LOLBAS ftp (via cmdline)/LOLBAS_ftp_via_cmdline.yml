@@ -1,0 +1,32 @@
+name: LOLBAS Ftp via cmd
+description: |
+  'Detects ftp usage'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Exfiltration
+relevantTechniques:
+  - T1135
+query: |
+  SecurityEvent 
+  | where EventID == 4688
+  | where (NewProcessName contains "\ftp.exe" and CommandLine contains "!")
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

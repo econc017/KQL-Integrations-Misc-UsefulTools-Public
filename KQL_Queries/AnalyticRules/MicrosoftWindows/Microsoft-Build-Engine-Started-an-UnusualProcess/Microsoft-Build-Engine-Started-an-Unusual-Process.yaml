@@ -1,0 +1,35 @@
+name: Microsoft Build Engine Started an Unusual Process 
+description: |
+  'An instance of MSBuild, the Microsoft Build Engine, started a PowerShell script or the Visual C# Command Line Compiler. This technique is sometimes used to deploy a malicious payload using the Build Engine.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - DefenseEvasion
+relevantTechniques:
+  - T1003
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where AccountType == "User" 
+  | where EventID == "4688"
+  | where ParentProcessName contains "msbuild"
+  | where Process contains "powershell" or Process contains "iexplore" or Process contains "csc"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer

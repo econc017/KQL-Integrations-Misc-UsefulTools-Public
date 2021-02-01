@@ -1,0 +1,30 @@
+name: Winword.exe launching Rundll32.exe
+description: |
+  'Rundll32.exe is used to run DLLs as executable programs. This rule checks for winword.exe creating an instance of rundll32.exe. If WINWORD.EXE spawns a rundll32 process, take note of the the column "NewProcessId". This is the process that could be malicios. Can use KQL to query for actions taken by that process ID, including changing its pid.'
+severity: Medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - InitialAccess
+  - Execution
+relevantTechniques:
+  - T1566
+  - T1204
+query: |
+  SecurityEvent | where EventID == 4688 | where ParentProcessName contains "WINWORD.EXE" and Process == "rundll32.exe" | extend AccountCustomEntity = Account | extend HostCustomEntity = Computer

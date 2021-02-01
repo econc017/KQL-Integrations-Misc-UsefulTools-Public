@@ -1,0 +1,7 @@
+Sysmon
+| where ((ParentImage == "WmiPrvSE.exe") 
+    and Image == "powershell.exe" 
+    and (CommandLine == "Value" 
+    or CommandLine == "env" 
+    or CommandLine == "IE" 
+    or CommandLine == "-w hidden -encodedcommand"))

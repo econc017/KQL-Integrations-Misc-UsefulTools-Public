@@ -1,0 +1,37 @@
+name: Potentially Obfuscated Cmd Command
+description: |
+  'CommandLine Obfuscation is tactic used to obfuscate cmd commands to deter responders and slow down attacks.
+  Often droppers also execute obfuscated Cmd commands to install malware on victim machines.'
+severity: medium
+enabled: false
+requiredDataConnectors:
+  - connectorId: SecurityEvents
+    dataTypes:
+      - SecurityEvent
+queryFrequency: 5m
+queryPeriod: 5m
+suppressionDuration: 5m
+triggerOperator: gt
+triggerThreshold: 0
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration: 
+    enabled: True
+    reopenClosedIncident: False
+    lookbackDuration: 5h
+    entitiesMatchingMethod: all
+    groupByEntities:
+tactics:
+  - Execution
+relevantTechniques:
+  - T1059
+query: |
+  SecurityEvent
+  | where Channel == "Security"
+  | where AccountType != "Machine"
+  | where EventID == "4688"
+  | where CommandLine contains "^" 
+  or CommandLine contains "%" 
+  or CommandLine contains ";"
+  | extend AccountCustomEntity = Account 
+  | extend HostCustomEntity = Computer
