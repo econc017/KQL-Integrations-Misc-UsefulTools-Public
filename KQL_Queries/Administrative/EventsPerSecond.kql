@@ -1,0 +1,8 @@
+// This query will show the billable average events per second and the maximum events received at some point in a second for all KQL tables.
+union withsource = tt *
+| where _IsBillable == true
+| where TimeGenerated >= ago(1h)
+| summarize count() by bin(_TimeReceived, 1m), Type, _BilledSize
+| extend count_60 = count_ / 60
+| summarize ['Avg eps'] = avg(count_60), ['Max eps'] = max(count_60) by ['Table Name'] = Type
+| order  by ['Avg eps'] desc
